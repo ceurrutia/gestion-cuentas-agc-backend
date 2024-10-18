@@ -24,6 +24,12 @@ mongoose.connect(process.env.MONGO_URI, { useNewUrlParser: true, useUnifiedTopol
         process.exit(1);  // Salir en caso de error
     });
 
+// Ruta de ejemplo en raiz
+app.get('/', (req, res)=> {
+    res.send('<h1> Data </h1>')
+    res.end()
+})
+
 // Ruta de obtener cuentas
 app.get('/cuentas', async (req, res) => {
     try {
