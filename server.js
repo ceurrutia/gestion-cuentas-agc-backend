@@ -7,26 +7,26 @@ const Cuenta = require('./models/cuenta');
 dotenv.config();
 
 const app = express();
-app.use(cors());
+app.use(cors({
+    origin: ['https://gestion-cuentas-agc-frontend-apktwvaot.vercel.app', 'http://localhost:5173'],  
+    methods: ['GET', 'POST', 'PUT', 'DELETE'],
+    allowedHeaders: ['Content-Type', 'Authorization']  
+}));
 app.use(express.json());
 
-
-// Conexión con DDBB
+// Conexión a la base de datos
 mongoose.connect(process.env.MONGO_URI, { useNewUrlParser: true, useUnifiedTopology: true })
     .then(() => console.log('Conectado a MongoDB'))
     .catch(err => console.log('Error al conectar con MongoDB:', err));
 
-app.use(cors({
-    origin: 'https://gestion-cuentas-agc-frontend-apktwvaot.vercel.app, https://localhost:5000/cuentas',  
-    methods: ['GET', 'POST', 'PUT', 'DELETE'],
-    allowedHeaders: ['Content-Type', 'Authorization']  
-}));
-
 // Rutas
-// Toodas las cuentas
 app.get('/cuentas', async (req, res) => {
+    const nombreApellido = req.query.nombreApellido;
     try {
-        const cuentas = await Cuenta.find();
+        const query = nombreApellido 
+            ? { nombreApellido: { $regex: `^${nombreApellido}`, $options: 'i' } } 
+            : {};
+        const cuentas = await Cuenta.find(query);
         res.json(cuentas);
     } catch (err) {
         res.status(500).json({ error: 'Error al obtener las cuentas' });
@@ -34,7 +34,6 @@ app.get('/cuentas', async (req, res) => {
 });
 
 app.get('/cuentas/:id', async (req, res) => {
-   
     try {
         const cuenta = await Cuenta.findById(req.params.id);
         if (!cuenta) {
@@ -42,12 +41,10 @@ app.get('/cuentas/:id', async (req, res) => {
         }
         res.json(cuenta);
     } catch (err) {
-        
         res.status(500).json({ error: 'Error al obtener la cuenta' });
     }
 });
 
-// Crear una nueva cuenta
 app.post('/cuentas', async (req, res) => {
     const { nombreApellido, descripcion, cuentaX, cuentaInstagram, cuentaLinkedIn, comentarios } = req.body;
     if (!nombreApellido) {
@@ -62,7 +59,6 @@ app.post('/cuentas', async (req, res) => {
     }
 });
 
-// Eliminar una cuenta por ID
 app.delete('/cuentas/:id', async (req, res) => {
     try {
         const cuentaEliminada = await Cuenta.findByIdAndDelete(req.params.id);
@@ -75,8 +71,6 @@ app.delete('/cuentas/:id', async (req, res) => {
     }
 });
 
-//put
-
 app.put('/cuentas/:id', async (req, res) => {
     try {
         const cuentaActualizada = await Cuenta.findByIdAndUpdate(req.params.id, req.body, { new: true });
@@ -88,24 +82,6 @@ app.put('/cuentas/:id', async (req, res) => {
         res.status(500).json({ error: 'Error al actualizar la cuenta' });
     }
 });
-
-
-
-// BUSCADR POR nombre y apellido
-app.get('/cuentas', async (req, res) => {
-    const nombreApellido = req.query.nombreApellido;
-    try {
-        const cuentas = await Cuenta.find({ 
-            // Coincidir las primeras letras, ojo
-            nombreApellido: { $regex: `^${nombreApellido}`, $options: 'i' } 
-        }); 
-        res.json(cuentas);
-    } catch (err) {
-        res.status(500).json({ error: 'Error al obtener las cuentas' });
-    }
-});
-
-
 
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
