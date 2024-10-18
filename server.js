@@ -8,7 +8,7 @@ dotenv.config();
 
 const app = express();
 app.use(cors({
-    origin: ['https://gestion-cuentas-agc-frontend-apktwvaot.vercel.app', 'http://localhost:5173'],  
+    origin: ['https://gestion-cuentas-agc-frontend-apktwvaot.vercel.app','https://gestion-cuentas-agc-frontend.vercel.app/', 'http://localhost:5173'],  
     methods: ['GET', 'POST', 'PUT', 'DELETE'],
     allowedHeaders: ['Content-Type', 'Authorization']  
 }));
