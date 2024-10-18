@@ -19,23 +19,6 @@ mongoose.connect(process.env.MONGO_URI)
     .then(() => console.log('Conectado a MongoDB'))
     .catch(err => console.log('Error al conectar con MongoDB:', err));
 
-const connectWithRetry = () => {
-        console.log('Intentando conectar a MongoDB...');
-        mongoose.connect(process.env.MONGO_URI, { 
-            useNewUrlParser: true, 
-            useUnifiedTopology: true,
-            serverSelectionTimeoutMS: 5000  
-        })
-        .then(() => console.log('Conectado a MongoDB'))
-        .catch(err => {
-            console.error('Error al conectar a MongoDB:', err);
-            console.log('Reintentando en 5 segundos...');
-            setTimeout(connectWithRetry, 5000);  
-        });
-    };
-    
-    connectWithRetry();
-
 // Rutas
 app.get('/cuentas', async (req, res) => {
     const nombreApellido = req.query.nombreApellido;
@@ -100,7 +83,7 @@ app.put('/cuentas/:id', async (req, res) => {
     }
 });
 
-const PORT = process.env.PORT || 5000;
+const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
     console.log(`Servidor escuchando en puerto ${PORT}`);
 });
