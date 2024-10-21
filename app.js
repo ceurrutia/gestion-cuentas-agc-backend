@@ -4,6 +4,7 @@ const cors = require('cors');
 const dotenv = require('dotenv');
 const Cuenta = require('./models/cuenta');
 
+
 dotenv.config();
 
 const app = express();
@@ -16,19 +17,19 @@ app.use(cors({
 }));
 app.use(express.json());
 
-// Conexión a la ddbb
-mongoose.connect(process.env.MONGO_URI, { useNewUrlParser: true, useUnifiedTopology: true })
+// Conexión a la DDBB
+mongoose.connect(process.env.MONGO_URI)
     .then(() => console.log('Conectado a MongoDB'))
     .catch(err => {
         console.error('Error al conectar con MongoDB:', err);
-        process.exit(1);  // Salir en caso de error
+        process.exit(1);  
     });
 
 // Ruta de ejemplo en raiz
-app.get('/', (req, res)=> {
-    res.send('<h1> Data </h1>')
+app.get('/', (req, res) => {
+    res.send("<h1>Data</h1>");
     res.end()
-})
+  });
 
 // Ruta de obtener cuentas
 app.get('/cuentas', async (req, res) => {
@@ -37,7 +38,7 @@ app.get('/cuentas', async (req, res) => {
         const query = nombreApellido 
             ? { nombreApellido: { $regex: `^${nombreApellido}`, $options: 'i' } }
             : {};
-        const cuentas = await Cuenta.find(query);
+        const cuentas = await Cuenta.find(query).sort({ nombreApellido : 1});
         res.json(cuentas);
     } catch (err) {
         console.error('Error al obtener cuentas:', err);
